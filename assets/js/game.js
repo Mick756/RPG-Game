@@ -27,8 +27,8 @@ $(document).ready(function () {
             fullname: "Lord Voldemort",
             house: "DeathEater",
             health: 100,
-            damageMultiplier: 1.5,
-            shieldMultiplier: 1,
+            damageMultiplier: 1.2,
+            shieldMultiplier: 0.8,
             enemies: ["dumbledore", "harry", "cedric", "luna", "hermione", "severus"],
             selectionMessage: "I was ripped from my body, I was less than spirit, less than the meanest ghost... But still, I was alive."
         },
@@ -37,8 +37,8 @@ $(document).ready(function () {
             fullname: "Belltrix Lestrange",
             house: "DeathEater",
             health: 100,
-            damageMultiplier: 1.5,
-            shieldMultiplier: 1,
+            damageMultiplier: 1.3,
+            shieldMultiplier: .95,
             enemies: ["dumbledore", "harry", "cedric", "luna", "hermione", "severus"],
             selectionMessage: "Oh, he knows how to play, little bitty baby Potter."
 
@@ -48,7 +48,7 @@ $(document).ready(function () {
             fullname: "Lucius Malfoy",
             house: "DeathEater",
             health: 100,
-            damageMultiplier: 1.5,
+            damageMultiplier: 1.1,
             shieldMultiplier: 1,
             enemies: ["dumbledore", "harry", "cedric", "luna", "hermione", "severus"],
             selectionMessage: "It does not do to dwell on dreams and forget to live."
@@ -59,8 +59,8 @@ $(document).ready(function () {
             fullname: "Albus Dumbeldore",
             house: "Gryffindor",
             health: 100,
-            damageMultiplier: 1.4,
-            shieldMultiplier: .7,
+            damageMultiplier: 1.2,
+            shieldMultiplier: .75,
             enemies: ["voldemort", "bellatrix", "lucius", "severus", "draco"],
             selectionMessage: "It does not do to dwell on dreams and forget to live."
 
@@ -70,7 +70,7 @@ $(document).ready(function () {
             fullname: "Severus Snape",
             house: "Slytherin",
             health: 100,
-            damageMultiplier: 1,
+            damageMultiplier: 1.1,
             shieldMultiplier: .9,
             enemies: ["dumbledore", "harry", "cedric", "luna", "hermione"],
             selectionMessage: "It may have escaped your notice, but life isn't fair."
@@ -81,7 +81,7 @@ $(document).ready(function () {
             fullname: "Harry Potter",
             house: "Gryffindor",
             health: 100,
-            damageMultiplier: 1.3,
+            damageMultiplier: 1.25,
             shieldMultiplier: .8,
             enemies: ["voldemort", "bellatrix", "lucius", "severus", "draco"],
             selectionMessage: "I solemnly swear I am up to no good."
@@ -92,8 +92,8 @@ $(document).ready(function () {
             fullname: "Cedric Diggory",
             house: "Hufflepuff",
             health: 100,
-            damageMultiplier: 1,
-            shieldMultiplier: 1.3,
+            damageMultiplier: 1.1,
+            shieldMultiplier: .85,
             enemies: ["voldemort", "bellatrix", "lucius", "severus", "draco"],
             selectionMessage: "For a moment there, I thought you were going to let it get me."
 
@@ -114,8 +114,8 @@ $(document).ready(function () {
             fullname: "Draco Malfoy",
             house: "Slytherin",
             health: 100,
-            damageMultiplier: 1,
-            shieldMultiplier: 1.3,
+            damageMultiplier: 1.2,
+            shieldMultiplier: .8,
             enemies: ["voldemort", "bellatrix", "lucius", "severus", "draco"],
             selectionMessage: "I don't care what you did or who you saved, you are a constant curse on my family, Harry Potter."
 
@@ -125,8 +125,8 @@ $(document).ready(function () {
             fullname: "Hermione Granger",
             house: "Gryffindor",
             health: 100,
-            damageMultiplier: 1,
-            shieldMultiplier: 1.3,
+            damageMultiplier: 1.2,
+            shieldMultiplier: 0.8,
             enemies: ["voldemort", "bellatrix", "lucius", "severus", "draco"],
             selectionMessage: "Now, if you two don't mind, I'm going to bed, before either of you come up with another clever idea to get us killed — or worse, expelled."
         },
@@ -375,7 +375,7 @@ $(document).ready(function () {
         if (game.shielded) {
             shieldMultiplier = attacked.shieldMultiplier;
         }
-        var finalDamage = damagePerAttack * dmgMultiplier * shieldMultiplier;
+        var finalDamage = Math.round(damagePerAttack * dmgMultiplier * shieldMultiplier);
         return damageCharacter(attacked, finalDamage);
     }
 
