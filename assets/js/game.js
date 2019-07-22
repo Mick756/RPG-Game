@@ -222,7 +222,7 @@ $(document).ready(function () {
             }
             game.healing = true;
             var timer = setInterval(() => {
-                game.characterSelected.health += (2 * Math.round((game.characterSelected.health/10)));
+                game.characterSelected.health += (10 + Math.round((game.characterSelected.health/10)));
                 updateCharacterHealth();
             }, 1000);
             setTimeout(() => {
