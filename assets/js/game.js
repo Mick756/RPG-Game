@@ -7,15 +7,20 @@ $(document).ready(function () {
     var buttonLinks = ["assets/images/Dumbledore.jpg", "assets/images/Harry.jpg", "assets/images/Severus.jpg", "assets/images/Voldemort.jpg", "assets/images/Luna.jpg", "assets/images/Cedric.jpg", "assets/images/Lucius.jpg", "assets/images/Bellatrix.jpg", "assets/images/Draco.jpg", "assets/images/Hermione.jpg"];
     var buttons = [];
     var tempSelectedCharacter = null;
+    var damagePerAttack = 25;
 
     var game = {
+        over: false,
         characterSelected: null,
+        currentEnemy: null,
         characterConfirmed: false,
         enemySelected: null,
         shieldsLeft: 1,
         shielded: false,
-        healsLeft: 1,
+        healsLeft: 2,
+        healing: false,
         started: false,
+        waitingForComputer: false,
         enemyIndex: 0,
         Voldemort: {
             id: "voldemort",
@@ -24,8 +29,8 @@ $(document).ready(function () {
             health: 100,
             damageMultiplier: 1.5,
             shieldMultiplier: 1,
-            enemies: [this.Dumbledore, this.Harry, this.Cedric, this.Luna, this.Hermione, this.Severus],
-            slectionMessage: ""
+            enemies: ["dumbledore", "harry", "cedric", "luna", "hermione", "severus"],
+            selectionMessage: "I was ripped from my body, I was less than spirit, less than the meanest ghost... But still, I was alive."
         },
         Bellatrix: {
             id: "bellatrix",
@@ -34,8 +39,8 @@ $(document).ready(function () {
             health: 100,
             damageMultiplier: 1.5,
             shieldMultiplier: 1,
-            enemies: [this.Dumbledore, this.Harry, this.Cedric, this.Luna, this.Hermione],
-            slectionMessage: ""
+            enemies: ["dumbledore", "harry", "cedric", "luna", "hermione", "severus"],
+            selectionMessage: "Oh, he knows how to play, little bitty baby Potter."
 
         },
         Lucius: {
@@ -45,8 +50,8 @@ $(document).ready(function () {
             health: 100,
             damageMultiplier: 1.5,
             shieldMultiplier: 1,
-            enemies: [this.Dumbledore, this.Harry, this.Cedric, this.Luna, this.Hermione, this.Severus],
-            slectionMessage: ""
+            enemies: ["dumbledore", "harry", "cedric", "luna", "hermione", "severus"],
+            selectionMessage: "It does not do to dwell on dreams and forget to live."
 
         },
         Dumbledore: {
@@ -56,8 +61,8 @@ $(document).ready(function () {
             health: 100,
             damageMultiplier: 1.4,
             shieldMultiplier: .7,
-            enemies: [this.Voldemort, this.Bellatrix, this.Lucius, this.Severus],
-            slectionMessage: ""
+            enemies: ["voldemort", "bellatrix", "lucius", "severus", "draco"],
+            selectionMessage: "It does not do to dwell on dreams and forget to live."
 
         },
         Severus: {
@@ -67,8 +72,8 @@ $(document).ready(function () {
             health: 100,
             damageMultiplier: 1,
             shieldMultiplier: .9,
-            enemies: [this.Dumbledore, this.Harry, this.Cedric, this.Luna],
-            slectionMessage: ""
+            enemies: ["dumbledore", "harry", "cedric", "luna", "hermione"],
+            selectionMessage: "It may have escaped your notice, but life isn't fair."
 
         },
         Harry: {
@@ -78,8 +83,8 @@ $(document).ready(function () {
             health: 100,
             damageMultiplier: 1.3,
             shieldMultiplier: .8,
-            enemies: [this.Voldemort, this.Bellatrix, this.Lucius, this.Severus],
-            slectionMessage: ""
+            enemies: ["voldemort", "bellatrix", "lucius", "severus", "draco"],
+            selectionMessage: "I solemnly swear I am up to no good."
 
         },
         Cedric: {
@@ -89,8 +94,8 @@ $(document).ready(function () {
             health: 100,
             damageMultiplier: 1,
             shieldMultiplier: 1.3,
-            enemies: [this.Voldemort, this.Bellatrix, this.Lucius, this.Severus],
-            slectionMessage: ""
+            enemies: ["voldemort", "bellatrix", "lucius", "severus", "draco"],
+            selectionMessage: "For a moment there, I thought you were going to let it get me."
 
         },
         Luna: {
@@ -100,8 +105,8 @@ $(document).ready(function () {
             health: 100,
             damageMultiplier: 1.1,
             shieldMultiplier: .7,
-            enemies: [this.Voldemort, this.Bellatrix, this.Lucius, this.Severus],
-            slectionMessage: ""
+            enemies: ["voldemort", "bellatrix", "lucius", "severus", "draco"],
+            selectionMessage: "Oh, I’ve interrupted a deep thought, haven’t I? I can see it growing smaller in your eyes."
 
         },
         Draco: {
@@ -111,8 +116,8 @@ $(document).ready(function () {
             health: 100,
             damageMultiplier: 1,
             shieldMultiplier: 1.3,
-            enemies: [this.Voldemort, this.Bellatrix, this.Lucius, this.Severus],
-            slectionMessage: ""
+            enemies: ["voldemort", "bellatrix", "lucius", "severus", "draco"],
+            selectionMessage: "I don't care what you did or who you saved, you are a constant curse on my family, Harry Potter."
 
         },
         Hermione: {
@@ -122,11 +127,10 @@ $(document).ready(function () {
             health: 100,
             damageMultiplier: 1,
             shieldMultiplier: 1.3,
-            enemies: [this.Voldemort, this.Bellatrix, this.Lucius, this.Severus],
-            slectionMessage: ""
-
+            enemies: ["voldemort", "bellatrix", "lucius", "severus", "draco"],
+            selectionMessage: "Now, if you two don't mind, I'm going to bed, before either of you come up with another clever idea to get us killed — or worse, expelled."
         },
-        start: function(reset) {
+        start: function (reset) {
             if (reset) {
 
             } else {
@@ -155,6 +159,7 @@ $(document).ready(function () {
             $newButton.addClass("characterButton");
             $newImage.attr("src", src).addClass("characterImage");
             $health.addClass("characterHealth");
+            $health.attr("id", characterName + "Health");
             $fullName.addClass("characterFullName");
             $newButton.addClass("house" + character.house);
             $newButton.attr("id", characterName);
@@ -205,16 +210,83 @@ $(document).ready(function () {
         }
     });
 
+    $buttonHeal.on("click", function () {
+        if (game.over) return;
+        console.log("CLICKED");
+        if (!game.healing) {
+            if (game.healsLeft > 0) {
+                game.healsLeft -= 1;
+                $buttonHeal.text("Heal up! [" + game.healsLeft + "]")
+            } else {
+                return;
+            }
+            game.healing = true;
+            var timer = setInterval(() => {
+                game.characterSelected.health += 10;
+                updateCharacterHealth();
+            }, 1000);
+            setTimeout(() => {
+                clearInterval(timer);
+                game.healing = false;
+            }, 7000);
+        }
+    });
+
+    $buttonAttack.on("click", function () {
+        if (game.over) return;
+        console.log("CLICK");
+        if (game.waitingForComputer) {
+            logAction("Wait your turn!")
+        } else {
+            console.log("CLICK 1");
+            var enemyIsDead = attack(game.characterSelected, game.currentEnemy);
+            game.waitingForComputer = true;
+            if (enemyIsDead) {
+                logAction("You killed " + game.currentEnemy.fullname);
+                rotateToNextEnemy();
+                game.waitingForComputer = false;
+            } else {
+                setTimeout(() => {
+                    var playerIsDead = attack(game.currentEnemy, game.characterSelected);
+                    if (playerIsDead) {
+                        game.over = true;
+                        alert("You were killed by " + game.currentEnemy.fullname + "!");
+                    }
+                    console.log("CLICK 2");
+                }, 1000);
+                setTimeout(() => {
+                    game.waitingForComputer = false;
+                }, 1050);
+            }
+        }
+    });
+
+    $buttonShield.on("click", function () {
+        if (game.over) return;
+        if (!game.shielded) {
+            if (game.shieldsLeft > 0) {
+                game.shieldsLeft -= 1;
+                $buttonShield.text("Shield up! [" + game.shieldsLeft + "]")
+            } else {
+                return;
+            }
+            game.shielded = true;
+            setTimeout(() => {
+                game.shielded = false;
+            }, 10000);
+        }
+    });
+
     $buttonYes.on("click", function () {
         $buttonRow1.empty();
         $buttonYes.detach();
         $buttonNo.detach();
+        game.characterConfirmed = true;
+        game.characterSelected = getCharacterFromString($(tempSelectedCharacter).attr("id"));
+        logAction(game.characterSelected.selectionMessage);
         $buttonRow1.append($buttonHeal);
         $buttonRow1.append($buttonAttack);
         $buttonRow1.append($buttonShield);
-        game.characterConfirmed = true;
-        game.characterSelected = getCharacterFromString($(tempSelectedCharacter).attr("id"));
-        console.log(getCharacterFromString($(tempSelectedCharacter).attr("id")));
         game.start(false);
     });
 
@@ -231,6 +303,16 @@ $(document).ready(function () {
      * 
      * BEGIN UTIL FUNCTIONS
      */
+
+    /**
+     * Update the health of the selected character on screen
+     */
+    function updateCharacterHealth() {
+        buttonLinks.forEach(src => {
+            var characterName = src.split("/")[2].split(".")[0].toLowerCase();
+            $("#" + characterName + "Health").text(getCharacterFromString(characterName).health);
+        });
+    }
 
     /**
     * @description Detaches element from current element and appends it to 'to'.
@@ -266,14 +348,38 @@ $(document).ready(function () {
         return (game.characterSelected == null);
     }
 
+    /**
+     * Rotates to the next enemy based on 'game.enemyIndex'
+     */
     function rotateToNextEnemy() {
-        var nextEnemy = game.characterSelected.enemies[game.enemyIndex];
-        console.log(game.characterSelected.enemies);
-        if (false) {
-            console.log(nextEnemy);
-            moveElement("#" + nextEnemy.id, "#enemy");
+        var nextEnemy = getCharacterFromString(game.characterSelected.enemies[(Math.floor(Math.random() * game.characterSelected.enemies.length))]);
+        if (nextEnemy.health === 0) {
+            rotateToNextEnemy();
+            return;
         }
+        if (game.currentEnemy !== null) {
+            moveElement("#" + game.currentEnemy.id, "#characters");
+        }
+        moveElement("#" + nextEnemy.id, "#enemy");
+        game.currentEnemy = nextEnemy;
+        game.enemyIndex += 1;
     }
+
+    /**
+     * Attack a character 
+     * This method calculates damage and returns the value of 'damgeCharacter'
+     */
+    function attack(attacker, attacked) {
+        var dmgMultiplier = attacker.damageMultiplier;
+        var shieldMultiplier = 1;
+        if (game.shielded) {
+            shieldMultiplier = attacked.shieldMultiplier;
+        }
+        var finalDamage = damagePerAttack * dmgMultiplier * shieldMultiplier;
+        return damageCharacter(attacked, finalDamage);
+    }
+
+
 
     /**
      * @return false Character died
@@ -281,6 +387,11 @@ $(document).ready(function () {
      */
     function damageCharacter(character, damage) {
         character.health -= damage;
+        if (character.health < 0) {
+            character.health = 0;
+        }
+        updateCharacterHealth();
+        logAction(character.fullname + " was damaged for " + damage + "!")
         return (character.health <= 0);
     }
 
@@ -290,9 +401,9 @@ $(document).ready(function () {
     function logAction(message) {
         var $log = $("#actionLog");
         $log.empty();
-        var $message = $("<div>");
-        $message.addClass("actionMessage");
-        $message.text(message);
-        $log.prepend($message);
+        var $msg = $("<div>");
+        $msg.addClass("actionMessage");
+        $msg.text(message);
+        $log.prepend($msg);
     }
 });
