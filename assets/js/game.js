@@ -7,7 +7,7 @@ $(document).ready(function () {
     var buttonLinks = ["assets/images/Dumbledore.jpg", "assets/images/Harry.jpg", "assets/images/Severus.jpg", "assets/images/Voldemort.jpg", "assets/images/Luna.jpg", "assets/images/Cedric.jpg", "assets/images/Lucius.jpg", "assets/images/Bellatrix.jpg", "assets/images/Draco.jpg", "assets/images/Hermione.jpg"];
     var buttons = [];
     var tempSelectedCharacter = null;
-    var damagePerAttack = 25;
+    var damagePerAttack = 15;
 
     var game = {
         over: false,
@@ -222,7 +222,7 @@ $(document).ready(function () {
             }
             game.healing = true;
             var timer = setInterval(() => {
-                game.characterSelected.health += 10;
+                game.characterSelected.health += (2 * Math.round((game.characterSelected.health/10)));
                 updateCharacterHealth();
             }, 1000);
             setTimeout(() => {
@@ -234,11 +234,9 @@ $(document).ready(function () {
 
     $buttonAttack.on("click", function () {
         if (game.over) return;
-        console.log("CLICK");
         if (game.waitingForComputer) {
             logAction("Wait your turn!")
         } else {
-            console.log("CLICK 1");
             var enemyIsDead = attack(game.characterSelected, game.currentEnemy);
             game.waitingForComputer = true;
             if (enemyIsDead) {
@@ -252,11 +250,10 @@ $(document).ready(function () {
                         game.over = true;
                         alert("You were killed by " + game.currentEnemy.fullname + "!");
                     }
-                    console.log("CLICK 2");
-                }, 1000);
+                }, 500);
                 setTimeout(() => {
                     game.waitingForComputer = false;
-                }, 1050);
+                }, 550);
             }
         }
     });
@@ -354,6 +351,17 @@ $(document).ready(function () {
     function rotateToNextEnemy() {
         var nextEnemy = getCharacterFromString(game.characterSelected.enemies[(Math.floor(Math.random() * game.characterSelected.enemies.length))]);
         if (nextEnemy.health === 0) {
+            var allDead = true;
+            for (var i = 0; i < game.characterSelected.enemies.length; i++) {
+                if (getCharacterFromString(game.characterSelected.enemies[i]).health > 0) {
+                    allDead = false;
+                }
+            }
+            if (allDead) {
+                game.over = true;
+                alert("Wow you killed everyone.. you monster..")
+                return;
+            }
             rotateToNextEnemy();
             return;
         }
@@ -375,11 +383,16 @@ $(document).ready(function () {
         if (game.shielded) {
             shieldMultiplier = attacked.shieldMultiplier;
         }
-        var finalDamage = Math.round(damagePerAttack * dmgMultiplier * shieldMultiplier);
+        var finalDamage = Math.round(variate(damagePerAttack) * dmgMultiplier * shieldMultiplier);
         return damageCharacter(attacked, finalDamage);
     }
 
-
+    /**
+     * Adds variation to each attack
+     */
+    function variate(damage) {
+        return (damage + (Math.random() + (damage * Math.random())));
+    }
 
     /**
      * @return false Character died
